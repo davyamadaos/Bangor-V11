@@ -26,6 +26,9 @@ export async function extractLatest() {
 
     const width = info.width;
 
+    // Search from right to left because
+    // the newest point is at the right.
+
     for (let x = 665; x >= 620; x--) {
 
         const ys = [];
@@ -39,6 +42,8 @@ export async function extractLatest() {
             const g = data[i + 1];
             const b = data[i + 2];
 
+            // Detect blue pixels.
+
             if (
                 b > r + 20 &&
                 b > g + 20
@@ -47,7 +52,7 @@ export async function extractLatest() {
             }
         }
 
-        if (ys.length < 8)
+        if (ys.length < 5)
             continue;
 
         const groups = [];
@@ -56,12 +61,18 @@ export async function extractLatest() {
 
         for (let i = 1; i < ys.length; i++) {
 
+            // Join pixels that are within
+            // 20 vertical pixels of each other.
+
             if (
-                ys[i] <= ys[i - 1] + 2
+                ys[i] <= ys[i - 1] + 20
             ) {
                 current.push(ys[i]);
-            } else {
+            }
+            else {
+
                 groups.push(current);
+
                 current = [ys[i]];
             }
         }
@@ -80,15 +91,17 @@ export async function extractLatest() {
         groups.forEach(g => {
 
             console.log(
-                g[0],
-                "-",
-                g[g.length - 1],
-                "(" + g.length + ")"
+                g[0]
+                + " - "
+                + g[g.length - 1]
+                + " ("
+                + g.length
+                + ")"
             );
 
         });
 
-        // Lowest group on chart.
+        // The lowest group should be the river.
 
         const river =
             groups[
@@ -96,9 +109,16 @@ export async function extractLatest() {
             ];
 
         return {
+
             x,
+
+            // The river level is the TOP
+            // of the lowest blue group.
+
             y: river[0],
-            count: river.length
+
+            count:
+                river.length
         };
     }
 
