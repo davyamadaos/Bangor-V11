@@ -27,8 +27,7 @@ function forecast(
 ) {
 
     return (
-        level
-        +
+        level +
         (rateCmHr / 100)
         * hours
     );
@@ -113,7 +112,6 @@ async function run() {
         forecast: {
 
             "1h": {
-
                 level:
                     Number(
                         forecast(
@@ -125,7 +123,6 @@ async function run() {
             },
 
             "3h": {
-
                 level:
                     Number(
                         forecast(
@@ -137,7 +134,6 @@ async function run() {
             },
 
             "6h": {
-
                 level:
                     Number(
                         forecast(
@@ -150,7 +146,6 @@ async function run() {
         },
 
         series: [
-
             {
                 time:
                     now.toISOString(),
