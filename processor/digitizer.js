@@ -1,11 +1,19 @@
-import sharp from "sharp";
 import axios from "axios";
-import { PLOT, SEARCH } from "./calibration.js";
+import sharp from "sharp";
 
-export async function extractLatest(url) {
+const URL =
+    "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png";
+
+const LEFT = 65;
+const RIGHT = 672;
+
+const TOP = 24;
+const BOTTOM = 435;
+
+export async function extractLatest() {
 
     const response =
-        await axios.get(url, {
+        await axios.get(URL, {
             responseType: "arraybuffer"
         });
 
@@ -26,48 +34,55 @@ export async function extractLatest(url) {
     let latestY = null;
 
     for (
-        let x = PLOT.right - SEARCH.rightMargin;
-        x > PLOT.right - SEARCH.maxBacktrack;
+        let x = RIGHT;
+        x >= RIGHT - 60;
         x--
     ) {
 
-        let found = [];
+        const ys = [];
 
         for (
-            let y = PLOT.top;
-            y <= PLOT.bottom;
+            let y = TOP;
+            y <= BOTTOM;
             y++
         ) {
 
-            const idx =
+            const i =
                 (y * width + x) * 3;
 
-            const r = data[idx];
-            const g = data[idx + 1];
-            const b = data[idx + 2];
+            const r = data[i];
+
+            const g = data[i + 1];
+
+            const b = data[i + 2];
 
             if (
-                b > r + SEARCH.blueThreshold &&
-                b > g + SEARCH.blueThreshold
+                b > 120 &&
+                b > r + 25 &&
+                b > g + 25
             ) {
-                found.push(y);
+                ys.push(y);
             }
         }
 
-        if (found.length > 0) {
+        if (ys.length > 0) {
 
             latestX = x;
 
             latestY =
-                found.reduce((a, b) => a + b, 0)
-                / found.length;
+                ys.reduce(
+                    (a, b) => a + b,
+                    0
+                ) / ys.length;
 
             break;
         }
     }
 
     return {
+
         x: latestX,
+
         y: latestY
     };
 }
