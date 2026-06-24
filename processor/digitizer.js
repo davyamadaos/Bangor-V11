@@ -21,7 +21,8 @@ export async function extractLatest() {
                 resolveWithObject: true
             });
 
-    const width = info.width;
+    const width =
+        info.width;
 
     for (let x = 665; x >= 620; x--) {
 
@@ -32,9 +33,14 @@ export async function extractLatest() {
             const i =
                 (y * width + x) * 3;
 
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
+            const r =
+                data[i];
+
+            const g =
+                data[i + 1];
+
+            const b =
+                data[i + 2];
 
             if (
                 b > r + 20 &&
@@ -44,45 +50,85 @@ export async function extractLatest() {
             }
         }
 
-        if (ys.length < 3)
+        if (
+            ys.length < 3
+        ) {
             continue;
+        }
 
         const groups = [];
 
-        let current = [ys[0]];
+        let current =
+            [ys[0]];
 
-        for (let i = 1; i < ys.length; i++) {
+        for (
+            let i = 1;
+            i < ys.length;
+            i++
+        ) {
 
-            if (ys[i] <= ys[i - 1] + 8) {
-                current.push(ys[i]);
+            if (
+                ys[i]
+                <= ys[i - 1] + 8
+            ) {
+
+                current.push(
+                    ys[i]
+                );
+
             } else {
-                groups.push(current);
-                current = [ys[i]];
+
+                groups.push(
+                    current
+                );
+
+                current = [
+                    ys[i]
+                ];
             }
         }
 
-        groups.push(current);
+        groups.push(
+            current
+        );
 
-        // Use the lowest group with at least 3 pixels.
+        for (
+            let i =
+                groups.length - 1;
+            i >= 0;
+            i--
+        ) {
 
-        for (let i = groups.length - 1; i >= 0; i--) {
+            const group =
+                groups[i];
 
-            const g = groups[i];
+            if (
+                group.length >= 3
+            ) {
 
-            if (g.length >= 3) {
+                console.log(
+                    "Column:",
+                    x
+                );
 
-                console.log("Column:", x);
                 console.log(
                     "River:",
-                    g[0],
+                    group[0],
                     "-",
-                    g[g.length - 1]
+                    group[
+                        group.length - 1
+                    ]
                 );
 
                 return {
+
                     x,
-                    y: g[0],
-                    count: g.length
+
+                    y:
+                        group[0],
+
+                    count:
+                        group.length
                 };
             }
         }
