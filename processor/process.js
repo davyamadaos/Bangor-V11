@@ -22,15 +22,16 @@ function toGauge(level) {
 function forecast(level, rateCmHr, hours) {
 
     return (
-        level
-        +
+        level +
         (rateCmHr / 100) * hours
     );
 }
 
 async function run() {
 
-    console.log("Starting processor...");
+    console.log(
+        "Starting processor..."
+    );
 
     const latest =
         await extractLatest();
@@ -43,6 +44,11 @@ async function run() {
     console.log(
         "Latest Y:",
         latest.y
+    );
+
+    console.log(
+        "Blue pixels:",
+        latest.count
     );
 
     const epaLevel =
@@ -62,8 +68,8 @@ async function run() {
     /*
       Temporary trend estimate.
 
-      Later this will come from
-      historical levels.
+      This will later be calculated
+      from historical data.
     */
 
     const rateCmHr = 0;
@@ -87,13 +93,6 @@ async function run() {
         estimatedLevel:
             Number(
                 estimatedLevel.toFixed(3)
-            ),
-
-        gaugeLevel:
-            Number(
-                toGauge(
-                    estimatedLevel
-                ).toFixed(2)
             ),
 
         ageHours: 0,
@@ -162,7 +161,9 @@ async function run() {
 
     console.log(
         "Gauge:",
-        output.gaugeLevel
+        toGauge(
+            estimatedLevel
+        ).toFixed(2)
     );
 
     console.log(
