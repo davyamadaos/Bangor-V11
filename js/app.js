@@ -1,42 +1,36 @@
-import { CONFIG }
-from "./config.js";
+import { CONFIG, toGauge } from "./config.js";
+import { loadData } from "./api.js";
+import { render } from "./ui.js";
+import { forecast } from "./forecast.js";
+import { draw } from "./chart.js";
 
-import { loadData }
-from "./api.js";
-
-import { updateUI }
-from "./ui.js";
+let selected = 24;
+let data;
 
 async function refresh() {
 
-    try {
+    data = await loadData();
 
-        const data =
-            await loadData();
+    const f = forecast(data.series);
 
-        updateUI(data);
+    data.estimatedLevel = f.current;
+    data.estimatedGauge = toGauge(f.current);
+    data.rate = f.rateCmHr;
+    data.ageHours = 0;
 
-        document
-            .getElementById(
-                "epaImage"
-            )
-            .src =
-            CONFIG.epaImage;
+    render(data);
 
-    }
+    document.getElementById("epaImage").src = CONFIG.epaImage;
 
-    catch (error) {
-
-        console.error(error);
-    }
+    draw(document.getElementById("chart"), data.series, f);
 }
 
+document.querySelectorAll("button").forEach(b => {
+    b.onclick = () => {
+        selected = +b.dataset.h;
+        refresh();
+    };
+});
+
 refresh();
-
-setInterval(
-
-    refresh,
-
-    CONFIG.refreshMinutes
-    * 60000
-);
+setInterval(refresh, CONFIG.refreshMinutes * 60000);
