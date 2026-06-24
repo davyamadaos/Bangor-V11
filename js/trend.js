@@ -1,37 +1,12 @@
-export function getTrend(rateCmHr) {
+export function trend(rate) {
 
-    if (rateCmHr > 1) {
-
-        return {
-            text:
-                "▲ Rising " +
-                rateCmHr.toFixed(1) +
-                " cm/hr",
-
-            className:
-                "rising"
-        };
+    if (rate > 1) {
+        return { text: "▲ Rising " + rate.toFixed(1) + " cm/hr", class: "rising" };
     }
 
-    if (rateCmHr < -1) {
-
-        return {
-            text:
-                "▼ Falling " +
-                Math.abs(rateCmHr)
-                    .toFixed(1) +
-                " cm/hr",
-
-            className:
-                "falling"
-        };
+    if (rate < -1) {
+        return { text: "▼ Falling " + Math.abs(rate).toFixed(1) + " cm/hr", class: "falling" };
     }
 
-    return {
-
-        text: "■ Steady",
-
-        className:
-            "steady"
-    };
+    return { text: "■ Steady", class: "steady" };
 }
