@@ -4,9 +4,6 @@ import sharp from "sharp";
 const URL =
     "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png";
 
-const MIN_Y = 350;
-const MAX_Y = 435;
-
 export async function extractLatest() {
 
     const response = await axios.get(URL, {
@@ -24,11 +21,11 @@ export async function extractLatest() {
 
     const width = info.width;
 
-    for (let x = 665; x >= 620; x--) {
+    for (let x = 665; x >= 600; x--) {
 
-        const ys = [];
+        let highest = null;
 
-        for (let y = MIN_Y; y <= MAX_Y; y++) {
+        for (let y = 350; y <= 435; y++) {
 
             const i = (y * width + x) * 3;
 
@@ -40,48 +37,32 @@ export async function extractLatest() {
                 b > r + 20 &&
                 b > g + 20
             ) {
-                ys.push(y);
+                highest = y;
+                break;
             }
         }
 
-        if (ys.length < 2)
-            continue;
+        if (
+            highest !== null &&
+            highest < 410
+        ) {
 
-        const groups = [];
-
-        let current = [ys[0]];
-
-        for (let i = 1; i < ys.length; i++) {
-
-            if (ys[i] <= ys[i - 1] + 20) {
-                current.push(ys[i]);
-            }
-            else {
-                groups.push(current);
-                current = [ys[i]];
-            }
-        }
-
-        groups.push(current);
-
-        console.log("Column:", x);
-
-        groups.forEach(g => {
             console.log(
-                g[0],
-                "-",
-                g[g.length - 1]
+                "Column:",
+                x
             );
-        });
 
-        const river =
-            groups[0];
+            console.log(
+                "River Y:",
+                highest
+            );
 
-        return {
-            x,
-            y: river[0],
-            count: river.length
-        };
+            return {
+                x,
+                y: highest,
+                count: 1
+            };
+        }
     }
 
     throw new Error(
