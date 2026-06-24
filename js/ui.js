@@ -1,135 +1,27 @@
-import {
-    formatLevel,
-    formatGauge,
-    formatTime
-}
-from "./utils.js";
+import { fmtLevel, fmtGauge } from "./utils.js";
+import { trend } from "./trend.js";
 
-import {
-    getTrend
-}
-from "./trend.js";
+export function render(data) {
 
-export function updateUI(data) {
+    document.getElementById("currentLevel").textContent =
+        fmtLevel(data.estimatedLevel);
 
-    document
-        .getElementById(
-            "currentLevel"
-        )
-        .textContent =
-        formatLevel(
-            data.estimatedLevel
-        );
+    document.getElementById("currentGauge").textContent =
+        fmtGauge(data.estimatedGauge);
 
-    document
-        .getElementById(
-            "currentGauge"
-        )
-        .textContent =
-        formatGauge(
-            data.estimatedGauge
-        );
+    document.getElementById("epaLevel").textContent =
+        fmtLevel(data.epaLevel);
 
-    document
-        .getElementById(
-            "epaLevel"
-        )
-        .textContent =
-        formatLevel(
-            data.epaLevel
-        );
+    document.getElementById("epaGauge").textContent =
+        fmtGauge(data.epaGauge);
 
-    document
-        .getElementById(
-            "epaGauge"
-        )
-        .textContent =
-        formatGauge(
-            data.epaGauge
-        );
+    document.getElementById("epaAge").textContent =
+        data.ageHours.toFixed(1) + "h old";
 
-    document
-        .getElementById(
-            "epaAge"
-        )
-        .textContent =
-        data.ageHours.toFixed(1)
-        + " hours old";
+    const t = trend(data.rate);
 
-    const trend =
-        getTrend(data.rate);
+    const el = document.getElementById("trend");
 
-    const trendDiv =
-        document.getElementById(
-            "trend"
-        );
-
-    trendDiv.textContent =
-        trend.text;
-
-    trendDiv.className =
-        trend.className;
-
-    document
-        .getElementById(
-            "f1Level"
-        )
-        .textContent =
-        formatLevel(
-            data.forecast["1h"].level
-        );
-
-    document
-        .getElementById(
-            "f1Gauge"
-        )
-        .textContent =
-        formatGauge(
-            data.forecast["1h"].gauge
-        );
-
-    document
-        .getElementById(
-            "f3Level"
-        )
-        .textContent =
-        formatLevel(
-            data.forecast["3h"].level
-        );
-
-    document
-        .getElementById(
-            "f3Gauge"
-        )
-        .textContent =
-        formatGauge(
-            data.forecast["3h"].gauge
-        );
-
-    document
-        .getElementById(
-            "f6Level"
-        )
-        .textContent =
-        formatLevel(
-            data.forecast["6h"].level
-        );
-
-    document
-        .getElementById(
-            "f6Gauge"
-        )
-        .textContent =
-        formatGauge(
-            data.forecast["6h"].gauge
-        );
-
-    document
-        .getElementById(
-            "updatedTime"
-        )
-        .textContent =
-        formatTime(
-            data.updated
-        );
+    el.textContent = t.text;
+    el.className = t.class;
 }
