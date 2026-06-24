@@ -4,13 +4,18 @@ import sharp from "sharp";
 const URL =
     "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png";
 
+const TOP = 24;
+const BOTTOM = 435;
+
 export async function extractLatest() {
 
-    const response = await axios.get(URL, {
-        responseType: "arraybuffer"
-    });
+    const response =
+        await axios.get(URL, {
+            responseType: "arraybuffer"
+        });
 
-    const image = sharp(response.data);
+    const image =
+        sharp(response.data);
 
     const { data, info } =
         await image
@@ -21,13 +26,14 @@ export async function extractLatest() {
 
     const width = info.width;
 
-    for (let x = 670; x >= 620; x--) {
+    for (let x = 665; x >= 620; x--) {
 
         const ys = [];
 
-        for (let y = 24; y <= 435; y++) {
+        for (let y = TOP; y <= BOTTOM; y++) {
 
-            const i = (y * width + x) * 3;
+            const i =
+                (y * width + x) * 3;
 
             const r = data[i];
             const g = data[i + 1];
@@ -41,34 +47,59 @@ export async function extractLatest() {
             }
         }
 
-        if (ys.length >= 10) {
+        if (ys.length < 8)
+            continue;
 
-            console.log(
-                "Column:",
-                x
-            );
+        const groups = [];
 
-            console.log(
-                "Count:",
-                ys.length
-            );
+        let current = [ys[0]];
 
-            console.log(
-                "Min:",
-                ys[0]
-            );
+        for (let i = 1; i < ys.length; i++) {
 
-            console.log(
-                "Max:",
-                ys[ys.length - 1]
-            );
-
-            return {
-                x,
-                y: ys[ys.length - 1],
-                count: ys.length
-            };
+            if (
+                ys[i] <= ys[i - 1] + 2
+            ) {
+                current.push(ys[i]);
+            } else {
+                groups.push(current);
+                current = [ys[i]];
+            }
         }
+
+        groups.push(current);
+
+        console.log(
+            "Column:",
+            x
+        );
+
+        console.log(
+            "Groups:"
+        );
+
+        groups.forEach(g => {
+
+            console.log(
+                g[0],
+                "-",
+                g[g.length - 1],
+                "(" + g.length + ")"
+            );
+
+        });
+
+        // Lowest group on chart.
+
+        const river =
+            groups[
+                groups.length - 1
+            ];
+
+        return {
+            x,
+            y: river[0],
+            count: river.length
+        };
     }
 
     throw new Error(
