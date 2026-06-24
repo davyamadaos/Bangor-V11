@@ -1,39 +1,112 @@
 let chart;
 
-export function draw(canvas, series, forecast) {
+export function draw(canvas, data) {
 
-    if (chart) chart.destroy();
+    if (!canvas) return;
+
+    if (!data.series) return;
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    const riverData =
+        data.series.map(p => ({
+            x: new Date(p.time),
+            y: p.level
+        }));
+
+    const now =
+        new Date();
+
+    const forecastData = [
+
+        {
+            x: now,
+            y: data.estimatedLevel
+        },
+
+        {
+            x: new Date(
+                now.getTime() + 3600000
+            ),
+            y: data.forecast["1h"].level
+        },
+
+        {
+            x: new Date(
+                now.getTime() + 10800000
+            ),
+            y: data.forecast["3h"].level
+        },
+
+        {
+            x: new Date(
+                now.getTime() + 21600000
+            ),
+            y: data.forecast["6h"].level
+        }
+    ];
 
     chart = new Chart(canvas, {
+
         type: "line",
+
         data: {
+
             datasets: [
+
                 {
-                    label: "River",
-                    data: series.map(p => ({
-                        x: new Date(p.time),
-                        y: p.level
-                    })),
+                    label: "EPA",
+
+                    data: riverData,
+
                     borderColor: "#1565c0",
-                    pointRadius: 0
+
+                    borderWidth: 2,
+
+                    pointRadius: 3,
+
+                    tension: 0.3
                 },
+
                 {
                     label: "Forecast",
-                    data: [
-                        { x: new Date(), y: forecast.current },
-                        { x: Date.now()+3600000, y: forecast.plus1 },
-                        { x: Date.now()+10800000, y: forecast.plus3 },
-                        { x: Date.now()+21600000, y: forecast.plus6 }
-                    ],
+
+                    data: forecastData,
+
                     borderColor: "#ff9800",
-                    borderDash: [5,5],
-                    pointRadius: 3
+
+                    borderDash: [5, 5],
+
+                    borderWidth: 2,
+
+                    pointRadius: 3,
+
+                    tension: 0.3
                 }
             ]
         },
+
         options: {
+
             responsive: true,
-            maintainAspectRatio: false
+
+            maintainAspectRatio: false,
+
+            scales: {
+
+                x: {
+                    type: "time"
+                },
+
+                y: {
+                    title: {
+                        display: true,
+                        text: "Level (m)"
+                    }
+                }
+            }
         }
     });
 }
