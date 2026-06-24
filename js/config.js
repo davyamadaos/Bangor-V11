@@ -1,21 +1,15 @@
 export const CONFIG = {
 
-    station: "33008",
+    refreshMinutes: 15,
 
     epaImage:
-        "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png",
-
-    gaugeMultiplier: 16.921,
-
-    gaugeOffset: 1675.7,
-
-    refreshMinutes: 15
+        "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png"
 };
 
 export function toGauge(level) {
 
     return (
-        CONFIG.gaugeMultiplier * Number(level)
-        - CONFIG.gaugeOffset
+        14.664 * level
+        - 1452
     );
 }
