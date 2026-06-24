@@ -51,7 +51,7 @@ async function run() {
 
         ageHours: 0,
 
-        rate: 0,
+        rate: 2,
 
         forecast: {
 
