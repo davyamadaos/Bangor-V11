@@ -15,8 +15,8 @@ const BOTTOM_LEVEL = 98.90;
 function toGauge(level) {
 
     return (
-        16.921 * level
-        - 1675.7
+        14.664 * level
+        - 1452
     );
 }
 
@@ -52,14 +52,17 @@ async function run() {
         latest.y
     );
 
+    const correctedY =
+        latest.y - 12;
+
     console.log(
-        "Blue pixels:",
-        latest.count
+        "Corrected Y:",
+        correctedY
     );
 
     const epaLevel =
         levelFromPixel(
-            latest.y,
+            correctedY,
             TOP_PIXEL,
             BOTTOM_PIXEL,
             TOP_LEVEL,
@@ -71,15 +74,17 @@ async function run() {
         epaLevel.toFixed(3)
     );
 
-    const rateCmHr = 0;
-
-    const estimatedLevel =
-        epaLevel;
-
-    const gaugeLevel =
+    const gauge =
         toGauge(
-            estimatedLevel
+            epaLevel
         );
+
+    console.log(
+        "Gauge:",
+        gauge.toFixed(2)
+    );
+
+    const rateCmHr = 0;
 
     const now =
         new Date();
@@ -96,12 +101,12 @@ async function run() {
 
         estimatedLevel:
             Number(
-                estimatedLevel.toFixed(3)
+                epaLevel.toFixed(3)
             ),
 
         gaugeLevel:
             Number(
-                gaugeLevel.toFixed(2)
+                gauge.toFixed(2)
             ),
 
         ageHours: 0,
@@ -115,7 +120,7 @@ async function run() {
                 level:
                     Number(
                         forecast(
-                            estimatedLevel,
+                            epaLevel,
                             rateCmHr,
                             1
                         ).toFixed(3)
@@ -126,7 +131,7 @@ async function run() {
                 level:
                     Number(
                         forecast(
-                            estimatedLevel,
+                            epaLevel,
                             rateCmHr,
                             3
                         ).toFixed(3)
@@ -137,7 +142,7 @@ async function run() {
                 level:
                     Number(
                         forecast(
-                            estimatedLevel,
+                            epaLevel,
                             rateCmHr,
                             6
                         ).toFixed(3)
@@ -152,7 +157,7 @@ async function run() {
 
                 level:
                     Number(
-                        estimatedLevel.toFixed(3)
+                        epaLevel.toFixed(3)
                     )
             }
         ]
@@ -165,11 +170,6 @@ async function run() {
             null,
             2
         )
-    );
-
-    console.log(
-        "Gauge:",
-        gaugeLevel.toFixed(2)
     );
 
     console.log(
