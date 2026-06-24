@@ -4,17 +4,21 @@ import sharp from "sharp";
 const URL =
     "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png";
 
-const RIGHT = 672;
+const LEFT = 65;
+const RIGHT = 650;
+
 const TOP = 24;
 const BOTTOM = 435;
 
 export async function extractLatest() {
 
-    const response = await axios.get(URL, {
-        responseType: "arraybuffer"
-    });
+    const response =
+        await axios.get(URL, {
+            responseType: "arraybuffer"
+        });
 
-    const image = sharp(response.data);
+    const image =
+        sharp(response.data);
 
     const { data, info } =
         await image
@@ -25,40 +29,50 @@ export async function extractLatest() {
 
     const width = info.width;
 
-    for (let x = RIGHT; x >= RIGHT - 80; x--) {
+    for (
+        let x = RIGHT;
+        x >= 560;
+        x--
+    ) {
 
         const ys = [];
 
-        for (let y = TOP; y <= BOTTOM; y++) {
+        for (
+            let y = TOP;
+            y <= BOTTOM;
+            y++
+        ) {
 
-            const i = (y * width + x) * 3;
+            const i =
+                (y * width + x) * 3;
 
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
 
             if (
-                b > 140 &&
-                b > r + 30 &&
-                b > g + 30
+                b > 150 &&
+                b > r + 40 &&
+                b > g + 40
             ) {
                 ys.push(y);
             }
         }
 
-        // Ignore isolated blue pixels.
-        if (ys.length >= 6) {
+        // Ignore tiny groups.
+
+        if (ys.length >= 8) {
 
             ys.sort((a, b) => a - b);
 
-            const middle =
-                Math.floor(ys.length / 2);
-
-            const y = ys[middle];
+            const y =
+                ys[Math.floor(
+                    ys.length / 2
+                )];
 
             return {
-                x: x,
-                y: y,
+                x,
+                y,
                 count: ys.length
             };
         }
