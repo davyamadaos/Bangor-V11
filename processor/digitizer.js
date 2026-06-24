@@ -69,11 +69,10 @@ export async function extractLatest() {
 
             latestX = x;
 
-            latestY =
-                ys.reduce(
-                    (a, b) => a + b,
-                    0
-                ) / ys.length;
+            ys.sort((a, b) => a - b);
+
+latestY =
+    ys[Math.floor(ys.length / 2)];
 
             break;
         }
