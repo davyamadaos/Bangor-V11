@@ -1,50 +1,73 @@
 import sharp from "sharp";
 import axios from "axios";
-import { pixelToLevel } from "./calibration.js";
+import { PLOT, SEARCH } from "./calibration.js";
 
-export async function extractSeries(url) {
+export async function extractLatest(url) {
 
-    const res = await axios.get(url, {
-        responseType: "arraybuffer"
-    });
+    const response =
+        await axios.get(url, {
+            responseType: "arraybuffer"
+        });
 
-    const image = sharp(res.data);
-    const { data, info } = await image
-        .greyscale()
-        .raw()
-        .toBuffer({ resolveWithObject: true });
+    const image =
+        sharp(response.data);
 
-    const width = info.width;
-    const height = info.height;
+    const { data, info } =
+        await image
+            .raw()
+            .toBuffer({
+                resolveWithObject: true
+            });
 
-    const series = [];
+    const width =
+        info.width;
 
-    // scan vertical slices of chart
-    for (let x = 0; x < width; x += 5) {
+    let latestX = null;
+    let latestY = null;
 
-        let bestY = null;
-        let bestVal = 255;
+    for (
+        let x = PLOT.right - SEARCH.rightMargin;
+        x > PLOT.right - SEARCH.maxBacktrack;
+        x--
+    ) {
 
-        for (let y = 0; y < height; y++) {
+        let found = [];
 
-            const idx = y * width + x;
+        for (
+            let y = PLOT.top;
+            y <= PLOT.bottom;
+            y++
+        ) {
 
-            const val = data[idx];
+            const idx =
+                (y * width + x) * 3;
 
-            if (val < bestVal) {
-                bestVal = val;
-                bestY = y;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+
+            if (
+                b > r + SEARCH.blueThreshold &&
+                b > g + SEARCH.blueThreshold
+            ) {
+                found.push(y);
             }
         }
 
-        if (bestY !== null) {
+        if (found.length > 0) {
 
-            series.push({
-                time: new Date(Date.now() - (width - x) * 300000).toISOString(),
-                level: pixelToLevel(bestY)
-            });
+            latestX = x;
+
+            latestY =
+                found.reduce((a, b) => a + b, 0)
+                / found.length;
+
+            break;
         }
     }
 
-    return series;
+    return {
+        x: latestX,
+        y: latestY
+    };
 }
