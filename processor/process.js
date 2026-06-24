@@ -6,24 +6,23 @@ import { extractLatest }
 import { levelFromPixel }
     from "./scale.js";
 
-const IMAGE_URL =
-    "https://epawebapp.epa.ie/hydronet/output/internet/stations/CAS/33008/S/extralarge_3m_extralarge.png";
-
-/*
-TEMPORARY MANUAL SCALE.
-
-Until OCR is added.
-*/
-
 const topLevel = 99.20;
 const bottomLevel = 98.95;
 
 async function run() {
 
     const latest =
-        await extractLatest(
-            IMAGE_URL
-        );
+        await extractLatest();
+
+    console.log(
+        "Latest X:",
+        latest.x
+    );
+
+    console.log(
+        "Latest Y:",
+        latest.y
+    );
 
     const epaLevel =
         levelFromPixel(
@@ -34,15 +33,21 @@ async function run() {
             bottomLevel
         );
 
-    const output = {
+    console.log(
+        "EPA level:",
+        epaLevel.toFixed(3)
+    );
 
-        updated:
-            new Date().toISOString(),
+    const now =
+        new Date().toISOString();
 
-        epaLevel,
+    const data = {
 
-        estimatedLevel:
-            epaLevel,
+        updated: now,
+
+        epaLevel: epaLevel,
+
+        estimatedLevel: epaLevel,
 
         ageHours: 0,
 
@@ -51,36 +56,34 @@ async function run() {
         forecast: {
 
             "1h": {
-                level:
-                    epaLevel
+                level: epaLevel
             },
 
             "3h": {
-                level:
-                    epaLevel
+                level: epaLevel
             },
 
             "6h": {
-                level:
-                    epaLevel
+                level: epaLevel
             }
         },
 
-        series: []
+        series: [
+
+            {
+                time: now,
+                level: epaLevel
+            }
+        ]
     };
 
     fs.writeFileSync(
         "../data/latest.json",
         JSON.stringify(
-            output,
+            data,
             null,
             2
         )
-    );
-
-    console.log(
-        "EPA level:",
-        epaLevel.toFixed(3)
     );
 }
 
