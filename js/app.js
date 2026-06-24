@@ -7,26 +7,31 @@ let selected = 24;
 
 async function refresh() {
 
-    const data = await loadData();
+    try {
 
-    document.getElementById(
-        "epaImage"
-    ).src = CONFIG.epaImage;
+        const data = await loadData();
 
-    render(data);
+        document.getElementById(
+            "epaImage"
+        ).src = CONFIG.epaImage;
 
-    draw(
-        document.getElementById("chart"),
-        data
-    );
+        render(data);
+
+        draw(
+            document.getElementById("chart"),
+            data
+        );
+
+    } catch (err) {
+
+        console.error(err);
+    }
 }
 
 document.querySelectorAll("button")
 .forEach(button => {
 
     button.onclick = () => {
-
-        selected = +button.dataset.h;
 
         document
             .querySelectorAll("button")
@@ -35,6 +40,8 @@ document.querySelectorAll("button")
             );
 
         button.classList.add("active");
+
+        selected = +button.dataset.h;
 
         refresh();
     };
